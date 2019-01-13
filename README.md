@@ -13,12 +13,12 @@ I wrote all my queries for MySQL v5.7 as this is default for the provided[Fiddle
 
 ### Questions
 ##### Are there incidences of shops are increasing their prices? Does it occur on a regular basis?
-
+We can write a simple query to figure this out. From the orders table I can join each order with each product within it. Then I join each product with its respective parent product. 
 ```
 SELECT product_variations.product, 
-order_items.quantity,
-order_items.price,
-    	orders.placed_on
+    order_items.quantity,
+    order_items.price,
+    orders.placed_on
 FROM orders 
 INNER JOIN order_items 
 ON orders.id = order_items.order
@@ -26,19 +26,20 @@ INNER JOIN product_variations
 ON order_items.product_variation = product_variations.id
 ORDER BY product_variations.product, orders.placed_on
 ```
-
-| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+First 5 rows of result:
+| product  |  quantity | price  | placed_on |
+|---|---|---|---|
+| 1  | 2  | 91.44  | 2014-01-10 09:23:48  |
+| 1  | 2  | 91.66  | 2014-02-16 16:09:51  |
+| 1  | 3  | 93.69  | 2015-01-15 17:52:33  |
+| 1  | 3  | 93.09  | 2015-01-20 23:39:51  |
+| 1  | 1  | 94.41  | 2015-02-15 11:18:16  |
 
 Clearly, shops are increasing and decreasing their prices as seen in the trend above (which is consistent across all data). 
 
 It is impossible to tell whether price adjustments occur on a regular basis as we only know if the price is adjusted after a product is sold. Thus, multiple price adjustments could occur on a product without our knowledge between purchases. 
 
-
-
-
+##### What is the average annual price increase of products in this database, if any.
 ```
 until finished
 ```
