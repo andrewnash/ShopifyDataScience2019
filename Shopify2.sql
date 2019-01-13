@@ -97,5 +97,5 @@ CREATE TABLE yearly_avg AS
 
 -- calculate final average price increase for all years
 SELECT (four_avg + five_avg + six_avg + seven_avg + eight_avg)/5
-	AS average_annual_price_increase
+  AS average_annual_price_increase
 FROM yearly_avg;
