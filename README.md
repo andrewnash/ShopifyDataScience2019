@@ -1,30 +1,43 @@
 # Data Science Application Challenge- Summer 2019
 
-One Paragraph of project description goes here
-
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+My submission to the Shopify data science internship challenge for summer of 2019. Note this repository will remain private until the submission deadline (Jan 15, 2019) 
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+I wrote all my queries for MySQL v5.7 as this is default for the provided[Fiddle](https://www.db-fiddle.com/f/svQD6mgBJDcykiJAd4oe8w/7)
+
+### Assumptions
+* No two or more merchants sell the product.id
+* order_items.price is adjusted accordingly for order_items.quantity 
+
+
+### Questions
+##### Are there incidences of shops are increasing their prices? Does it occur on a regular basis?
 
 ```
-Give examples
+SELECT product_variations.product, 
+order_items.quantity,
+order_items.price,
+    	orders.placed_on
+FROM orders 
+INNER JOIN order_items 
+ON orders.id = order_items.order
+INNER JOIN product_variations
+ON order_items.product_variation = product_variations.id
+ORDER BY product_variations.product, orders.placed_on
 ```
 
-### Installing
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
 
-A step by step series of examples that tell you how to get a development env running
+Clearly, shops are increasing and decreasing their prices as seen in the trend above (which is consistent across all data). 
 
-Say what the step will be
+It is impossible to tell whether price adjustments occur on a regular basis as we only know if the price is adjusted after a product is sold. Thus, multiple price adjustments could occur on a product without our knowledge between purchases. 
 
-```
-Give the example
-```
 
-And repeat
+
 
 ```
 until finished
@@ -62,26 +75,7 @@ Add additional notes about how to deploy this on a live system
 * [Maven](https://maven.apache.org/) - Dependency Management
 * [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the Beerware License - see the [LICENSE.md](LICENSE.md) file for details
 
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
