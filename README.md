@@ -27,13 +27,14 @@ ON order_items.product_variation = product_variations.id
 ORDER BY product_variations.product, orders.placed_on
 ```
 First 5 rows of result:
-| product  |  quantity | price  | placed_on |
-|---|---|---|---|
-| 1  | 2  | 91.44  | 2014-01-10 09:23:48  |
-| 1  | 2  | 91.66  | 2014-02-16 16:09:51  |
-| 1  | 3  | 93.69  | 2015-01-15 17:52:33  |
-| 1  | 3  | 93.09  | 2015-01-20 23:39:51  |
-| 1  | 1  | 94.41  | 2015-02-15 11:18:16  |
+
+| product | quantity |  price |       placed_on      |
+|---------|----------|--------|----------------------|
+|    1    |    2     | 91.44  | 2014-01-10 09:23:48  |
+|    1    |    2     | 91.66  | 2014-02-16 16:09:51  |
+|    1    |    3     | 93.69  | 2015-01-15 17:52:33  |
+|    1    |    3     | 93.09  | 2015-01-20 23:39:51  |
+|    1    |    1     | 94.41  | 2015-02-15 11:18:16  |
 
 Clearly, shops are increasing and decreasing their prices as seen in the trend above (which is consistent across all data). 
 
