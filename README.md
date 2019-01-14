@@ -2,7 +2,7 @@
 
 My submission to the Shopify data science internship challenge for summer of 2019. Note this repository will remain private until the submission deadline (Jan 15, 2019) 
 
-### Prerequisites
+## Prerequisites
 
 I wrote all my queries for MySQL v5.7 as this is default for the provided [Fiddle](https://www.db-fiddle.com/f/svQD6mgBJDcykiJAd4oe8w/7)
 
@@ -11,8 +11,8 @@ I wrote all my queries for MySQL v5.7 as this is default for the provided [Fiddl
 * order_items.price is adjusted accordingly for order_items.quantity 
 
 
-### Questions
-#### Are there incidences of shops are increasing their prices? Does it occur on a regular basis?
+## Questions
+#### 1) Are there incidences of shops are increasing their prices? Does it occur on a regular basis?
 We can write a simple query to figure this out. From the orders table I can join each order with each product within it. Then I join each product with its respective parent product. 
 Query also located in the [Shopify1.sql](Shopify1.sql) file 
 ```
@@ -41,7 +41,7 @@ Clearly, shops are increasing and decreasing their prices as seen in the trend a
 
 It is impossible to tell whether price adjustments occur on a regular basis as we only know if the price is adjusted after a product is sold. Thus, multiple price adjustments could occur on a product without our knowledge between purchases. 
 
-#### What is the average annual price increase of products in this database, if any.
+#### 2) What is the average annual price increase of products in this database, if any.
 Since I'm limited to only using MySQL this query gets a little more complicated. I'll breakdown my thinking as much as I can below.
 Note: this could be optimized fairly easily into fewer queries and tables, but I chose to display it in the following form because I think it is far more readable.
 
@@ -128,7 +128,9 @@ First 5 rows of result:
 |    3     |    362.23	      |  366.97          |    381.01	   |  384.59           |  392.42           |
 |    4     |    23.8	      |  24.48	         |    25.28        |  25.58            |  26.72            |    
 
-The same is done for the last transaction of each year
+You might wounder why there are multiple rows for one product (i.e product 3 above). This occurs when two or more purchases are made at the exact same time stamp but have slightly different corresponding prices. I assume this discrepancy is related to transaction fees or is simply due to erroneous data. Later to overcome this issue, I average the difference in prices and use the result to calculate the yearly change in price.
+
+I use the same query below to join the last transaction of each year with its price
 ```
 -- Join last transaction with its respective price
 CREATE TABLE last_prices AS
@@ -150,9 +152,40 @@ CREATE TABLE last_prices AS
   INNER JOIN product_orders AS eight_prices
   ON eight_prices.placed_on = last_eight AND eight_prices.product = products;
 ```
-I calculated the average annual price increase to be 0.63% based on the first and last purchases made each year between 2014 and 2018. Technically, this is not correct as the actual price is not known at the beginning and end of each year, but most products have sales very close to the beginning and end of each year making my representation a reasonably close measure. No indication was given of the date the data was retrieved, so I did not incorporate the currently listed price from the products table.
-    
-A noteworthy observation is that when calculating the annual price increase, there are often cases where purchases are made at the exact same time stamp but have slightly different corresponding prices. I assume this discrepancy is related to transaction fees or is simply due to erroneous data. To overcome this issue, I averaged the difference in prices and used the result to calculate the yearly change in price. See example case below:
+Next, I calculate the price change for each year, per product. Note: the AVG() function is used as discussed above, to overcome the issue of when two transactions occur at the same time stamp. 
+```
+-- Average repeat sales with slightly different prices and calculate difference
+CREATE TABLE change_in_prices AS
+  SELECT last_prices.products,
+    AVG(last_prices.last_four_price)  - AVG(first_prices.first_four_price)  AS 'four',
+    AVG(last_prices.last_five_price)  - AVG(first_prices.first_five_price)  AS 'five',
+    AVG(last_prices.last_six_price)   - AVG(first_prices.first_six_price)   AS 'six',
+    AVG(last_prices.last_seven_price) - AVG(first_prices.first_seven_price) AS 'seven',
+    AVG(last_prices.last_eight_price) - AVG(first_prices.first_eight_price) AS 'eight'
+  FROM last_prices
+  INNER JOIN first_prices
+  ON first_prices.products = last_prices.products
+  GROUP BY products;
+```
+
+First 5 rows of result 
+
+| products | four    | five   | six    | seven  | eight  |
+|----------|---------|--------|--------|--------|--------|
+| 1        | 0.2200  | 1.9300 | 0.8750 | 1.7600 | 0      |
+| 2        | 0.1000  | 0.2200 | 0.2300 | 0.1800 | 0.1799 |
+| 3        | 1.5399  | 7.8899 | 0      | 6.3499 | 7.5999 |
+| 4        | 0.9200  | 0.5600 | 0.3099 | 0.5300 | 0      |
+| 5        | 0.1700  | 0.2799 | 0.1700 | 0.0299 | 0.125  |
+
+Now that the price change difference for each product is calculated 
+
+
+
+
+
+Thus I calculated the average annual price increase to be 0.63% based on the first and last purchases made each year between 2014 and 2018. Technically, this is not correct as the actual price is not known at the beginning and end of each year, but most products have sales very close to the beginning and end of each year making my representation a reasonably close measure. No indication was given of the date the data was retrieved, so I did not incorporate the currently listed price from the products table.
+
 
 
 
