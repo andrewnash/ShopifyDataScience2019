@@ -206,7 +206,7 @@ Assuming data were available on what transactions occurred in what currency, my 
 
 #### 6) Based on your findings above, would you recommend building the new feature? Why or why not?
 
-According to [this](https://www.statista.com/statistics/256598/global-inflation-rate-compared-to-previous-year/), global (and Canadian) inflation rate is much larger than the 0.61% I calculated from the data, so at first glance, a new feature to help merchants seems justified. However, I believe further analysis should be conducted before continuing. In particular, I would like to address and ideally resolve the following concerns I have
+According to [this](https://www.statista.com/statistics/256598/global-inflation-rate-compared-to-previous-year/), global (and Canadian) inflation rate is much larger than what I calculated from the data, so at first glance, a new feature to help merchants seems justified. However, I believe further analysis should be conducted before continuing. In particular, I would like to address and ideally resolve the following concerns I have
 
 * Currently, my data points for the yearly average price increase are taken at the closest purchase to the beginning and end of each year. It is possible that holiday sales (i.e Christmas, boxing day, and new years) affect these data points making them unreliable, so perhaps data points should be taken later in the year?
 * Some products have sales of 0-1 orders in a year, my analysis does not account for this, making them have a yearly change of 0 which could lead to inaccuracies.
