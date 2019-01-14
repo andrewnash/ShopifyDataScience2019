@@ -91,7 +91,7 @@ Next I joined the date of the first transaction of each year with its respective
 ```
 -- Join first transaction with its respective price
 CREATE TABLE first_prices AS
-	SELECT DISTINCT first_dates.products,
+  SELECT DISTINCT first_dates.products,
     four_prices.price  AS first_four_price,
     five_prices.price  AS first_five_price,
     six_prices.price   AS first_six_price,
@@ -153,12 +153,12 @@ Now that the price change difference for each product is calculated, simply usin
 ```
 -- calculate yearly average
 CREATE TABLE yearly_avg AS
-	SELECT AVG(four) AS 'four_avg',
+  SELECT AVG(four) AS 'four_avg',
     AVG(five)    AS 'five_avg',
     AVG(six)     AS 'six_avg',
     AVG(seven)   AS 'seven_avg',
     AVG(eight)   AS 'eight_avg'
-	FROM change_in_prices;
+  FROM change_in_prices;
 ```
 Result:
 
