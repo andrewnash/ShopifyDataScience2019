@@ -44,6 +44,7 @@ It is impossible to tell whether price adjustments occur on a regular basis as w
 #### 2) What is the average annual price increase of products in this database, if any.
 Since I'm limited to only using MySQL this query gets a little more complicated. I'll breakdown my thinking as much as I can below.
 Note: this could be optimized fairly easily into fewer queries and tables, but I chose to display it in the following form because I think it is far more readable.
+Query also located in the [Shopify2.sql](Shopify2.sql) file.
 
 First I recreate the query from the first question to reference throughout
 ```
