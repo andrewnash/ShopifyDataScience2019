@@ -170,10 +170,16 @@ Finally from this the average price increase for all years can be calculated by 
 ```
 -- calculate final average price increase for all years
 SELECT (four_avg + five_avg + six_avg + seven_avg + eight_avg)/5
-	AS average_annual_price_increase
+  AS average_annual_price_increase
 FROM yearly_avg;
 ```
-Thus I calculated the average annual price increase to be 0.63% based on the first and last purchases made each year between 2014 and 2018. Technically, this is not correct as the actual price is not known at the beginning and end of each year, but most products have sales very close to the beginning and end of each year making my representation a reasonably close measure. No indication was given of the date the data was retrieved, so I did not incorporate the currently listed price from the products table.
+Result:
+
+| average_annual_price_increase |
+|-------------------------------|
+| 0.6936                        |
+
+Thus I calculated the average annual price increase to be $0.63 based on the first and last purchases made each year between 2014 and 2018. Technically, this is not correct as the actual price is not known at the beginning and end of each year, but most products have sales very close to the beginning and end of each year making my representation a reasonably close measure. No indication was given of the date the data was retrieved, so I did not incorporate the currently listed price from the products table.
 
 
 #### 3) If it were being redeveloped, what changes would you make to the database schema given to make it more flexible?
