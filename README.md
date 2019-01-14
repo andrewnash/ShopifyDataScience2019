@@ -84,18 +84,8 @@ First 5 rows of result:
 |    5     | 2014-02-17 01:25:58 | 2015-01-01 09:17:13 | 2016-01-24 17:31:50 | 2017-07-03 11:26:47 | 2018-04-23 02:30:28 |
 
 The same is done to identify the date of the last transaction of each year using the MAX() function
-```
--- Find the first transaction (max) of each year
-CREATE TABLE last_dates AS
-	SELECT product_orders.product as products,
-    MAX(CASE WHEN YEAR(placed_on) = '2014' THEN placed_on END) AS 'last_four',  --2014
-    MAX(CASE WHEN YEAR(placed_on) = '2015' THEN placed_on END) AS 'last_five',  --2015
-    MAX(CASE WHEN YEAR(placed_on) = '2016' THEN placed_on END) AS 'last_six',   --2016
-    MAX(CASE WHEN YEAR(placed_on) = '2017' THEN placed_on END) AS 'last_seven', --2017
-    MAX(CASE WHEN YEAR(placed_on) = '2018' THEN placed_on END) AS 'last_eight'  --2018
-  FROM product_orders
-  GROUP BY product_orders.product;
-```
+
+
 Next I joined the date of the first transaction of each year with its respective transaction
 ```
 -- Join first transaction with its respective price
@@ -130,28 +120,8 @@ First 5 rows of result:
 
 You might wounder why there are multiple rows for one product (i.e product 3 above). This occurs when two or more purchases are made at the exact same time stamp but have slightly different corresponding prices. I assume this discrepancy is related to transaction fees or is simply due to erroneous data. Later to overcome this issue, I average the difference in prices and use the result to calculate the yearly change in price.
 
-I use the same query below to join the last transaction of each year with its price
-```
--- Join last transaction with its respective price
-CREATE TABLE last_prices AS
-  SELECT DISTINCT last_dates.products,
-    four_prices.price  AS last_four_price,
-    five_prices.price  AS last_five_price,
-    six_prices.price   AS last_six_price,
-    seven_prices.price AS last_seven_price,
-    eight_prices.price AS last_eight_price
-  FROM last_dates
-  INNER JOIN product_orders AS four_prices
-  ON four_prices.placed_on = last_four AND four_prices.product = products
-  INNER JOIN product_orders AS five_prices
-  ON five_prices.placed_on = last_five AND five_prices.product = products
-  INNER JOIN product_orders AS six_prices
-  ON six_prices.placed_on = last_six AND six_prices.product = products
-  INNER JOIN product_orders AS seven_prices
-  ON seven_prices.placed_on = last_seven AND seven_prices.product = products
-  INNER JOIN product_orders AS eight_prices
-  ON eight_prices.placed_on = last_eight AND eight_prices.product = products;
-```
+I use the same query to join the last transaction of each year with its price
+
 Next, I calculate the price change for each year, per product. Note: the AVG() function is used as discussed above, to overcome the issue of when two transactions occur at the same time stamp. 
 ```
 -- Average repeat sales with slightly different prices and calculate difference
@@ -178,49 +148,64 @@ First 5 rows of result
 | 4        | 0.9200  | 0.5600 | 0.3099 | 0.5300 | 0      |
 | 5        | 0.1700  | 0.2799 | 0.1700 | 0.0299 | 0.125  |
 
-Now that the price change difference for each product is calculated 
+Now that the price change difference for each product is calculated, simply using the AVG() function on each column will give us the average change each year.
+```
+-- calculate yearly average
+CREATE TABLE yearly_avg AS
+	SELECT AVG(four) AS 'four_avg',
+    AVG(five)    AS 'five_avg',
+    AVG(six)     AS 'six_avg',
+    AVG(seven)   AS 'seven_avg',
+    AVG(eight)   AS 'eight_avg'
+	FROM change_in_prices;
+```
+Result:
 
+| four_avg | five_avg | six_avg  | seven_avg | eight_avg |
+|----------|----------|----------|-----------|-----------|
+| 0.7274   | 0.8588   | 0.6487   | 0.6337    | 0.5994    |
 
-
-
-
+Finally from this the average price increase for all years can be calculated by finding the average on each column
+```
+-- calculate final average price increase for all years
+SELECT (four_avg + five_avg + six_avg + seven_avg + eight_avg)/5
+	AS average_annual_price_increase
+FROM yearly_avg;
+```
 Thus I calculated the average annual price increase to be 0.63% based on the first and last purchases made each year between 2014 and 2018. Technically, this is not correct as the actual price is not known at the beginning and end of each year, but most products have sales very close to the beginning and end of each year making my representation a reasonably close measure. No indication was given of the date the data was retrieved, so I did not incorporate the currently listed price from the products table.
 
 
+#### 3) If it were being redeveloped, what changes would you make to the database schema given to make it more flexible?
+
+As hinted at in the introduction to the problem, it would be useful if changes merchants have made to product prices were recorded in the database, then a real answer could be given in #2. 
+
+I also think it could be useful to break down items into categories. Doing this may provide more insight into the data when analysing for features/phenomena like ones described in the problem statement. Some categories like Apple Electronics might have a static price which rarely changes or some categories might fluctuate in price far more often than others. 
+
+Changing to a noSQL database would be the ultimate form of flexibility as data would be unstructured.
+
+#### 4) Does the query (/queries) you wrote scale? What if there were hundreds of thousands of products, customers, variations and orders? What changes might you make to your technique, or the database itself, to optimize this sort of analysis?
+
+Currently, my queries are currently dependent upon the fact that we are only analysing years 2014 - 2018 (as I am not aware of any way to avoid manually searching for different years in mySQL v5.7). If more data were added for 2019, an extra year column would need to be added to each table to represent this. 
+
+Obviously, creating tables for only one use is not the most efficient option. To make the most scalable/efficient query, it would be ideal to use one big query followed by many sub-queries. If I was tasked with this job without the constraint of only using mySQL queries, I would export the data obtained from my query in Part #1 and interpret it in Python. Since no more data is needed after the first query, a Python script would be a lot more scalable. This Python script could easily be written to require no changes no matter how much the data changes because it is a Turing complete language, unlike mySQL.
+
+Another possible improvement is changing to a noSQL database like MongoDB. It is possible unstructured data is more suitable for this particular use case. Instead of joining product tables, order tables, customer tables, etc., one table could store most of this information (i.e., primary key represents merchant who has an array of transactions with an array of items in each transaction).
+
+Finally, more resources could be allocated to the mySQL server to increase indexing speed.
+
+#### 5) Without rewriting it, how would your analysis change if the prices were presented in multiple currencies?
+
+Assuming data were available on what transactions occurred in what currency, my analysis would not have to change much. First, I would store a table of conversion rates, and then define one master currency. Finally, when selecting a price I would just multiply it by the appropriate conversion rate. 
+
+#### 6) Based on your findings above, would you recommend building the new feature? Why or why not?
+
+According to [this](https://www.statista.com/statistics/256598/global-inflation-rate-compared-to-previous-year/), global (and Canadian) inflation rate is much larger than the 0.61% I calculated from the data, so at first glance, a new feature to help merchants seems justified. However, I believe further analysis should be conducted before continuing. In particular, I would like to address and ideally resolve the following concerns I have
+
+Currently, my data points for the yearly average price increase are taken at the closest purchase to the beginning and end of each year. It is possible that holiday sales (i.e Christmas, boxing day, and new years) affect these data points making them unreliable, so perhaps data points should be taken later in the year?
+Some products have sales of 0-1 orders in a year, my analysis does not account for this, making them have a yearly change of 0 which could lead to inaccuracies.
+It could be useful to break products down into different categories. Is it possible different categories have different average price increases? Then perhaps this should be included in the feature.
 
 
-
-End with an example of getting some data out of the system or using it for a little demo
-    
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
 ## License
 
