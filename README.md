@@ -179,7 +179,7 @@ Result:
 |-------------------------------|
 | 0.6936                        |
 
-Thus I calculated the average annual price increase to be $0.63 based on the first and last purchases made each year between 2014 and 2018. Technically, this is not correct as the actual price is not known at the beginning and end of each year, but most products have sales very close to the beginning and end of each year making my representation a reasonably close measure. No indication was given of the date the data was retrieved, so I did not incorporate the currently listed price from the products table.
+Thus I calculated the average annual price increase to be $0.69 based on the first and last purchases made each year between 2014 and 2018. Technically, this is not correct as the actual price is not known at the beginning and end of each year, but most products have sales very close to the beginning and end of each year making my representation a reasonably close measure. No indication was given of the date the data was retrieved, so I did not incorporate the currently listed price from the products table.
 
 
 #### 3) If it were being redeveloped, what changes would you make to the database schema given to make it more flexible?
@@ -198,7 +198,7 @@ Obviously, creating tables for only one use is not the most efficient option. To
 
 Another possible improvement is changing to a noSQL database like MongoDB. It is possible unstructured data is more suitable for this particular use case. Instead of joining product tables, order tables, customer tables, etc., one table could store most of this information (i.e., primary key represents merchant who has an array of transactions with an array of items in each transaction).
 
-Finally, more resources could be allocated to the mySQL server to increase indexing speed.
+Finally, more resources could be allocated to the mySQL server to increase indexing speed. You can never go wrong upgrading the servers CPU, memory, disk, or network connection.
 
 #### 5) Without rewriting it, how would your analysis change if the prices were presented in multiple currencies?
 
@@ -208,9 +208,9 @@ Assuming data were available on what transactions occurred in what currency, my 
 
 According to [this](https://www.statista.com/statistics/256598/global-inflation-rate-compared-to-previous-year/), global (and Canadian) inflation rate is much larger than the 0.61% I calculated from the data, so at first glance, a new feature to help merchants seems justified. However, I believe further analysis should be conducted before continuing. In particular, I would like to address and ideally resolve the following concerns I have
 
-Currently, my data points for the yearly average price increase are taken at the closest purchase to the beginning and end of each year. It is possible that holiday sales (i.e Christmas, boxing day, and new years) affect these data points making them unreliable, so perhaps data points should be taken later in the year?
-Some products have sales of 0-1 orders in a year, my analysis does not account for this, making them have a yearly change of 0 which could lead to inaccuracies.
-It could be useful to break products down into different categories. Is it possible different categories have different average price increases? Then perhaps this should be included in the feature.
+* Currently, my data points for the yearly average price increase are taken at the closest purchase to the beginning and end of each year. It is possible that holiday sales (i.e Christmas, boxing day, and new years) affect these data points making them unreliable, so perhaps data points should be taken later in the year?
+* Some products have sales of 0-1 orders in a year, my analysis does not account for this, making them have a yearly change of 0 which could lead to inaccuracies.
+* It could be useful to break products down into different categories. Is it possible different categories have different average price increases? Then perhaps this should be included in the feature.
 
 
 
