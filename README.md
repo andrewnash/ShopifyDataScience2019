@@ -15,7 +15,7 @@ I wrote all my queries for MySQL v5.7 as this is default for the provided [Fiddl
 #### 1) Are there incidences of shops are increasing their prices? Does it occur on a regular basis?
 We can write a simple query to figure this out. From the orders table I can join each order with each product within it. Then I join each product with its respective parent product. 
 Query also located in the [Shopify1.sql](Shopify1.sql) file 
-```
+```SQL
 SELECT product_variations.product, 
     order_items.quantity,
     order_items.price,
@@ -47,7 +47,7 @@ Note: this could be optimized fairly easily into fewer queries and tables, but I
 Query also located in the [Shopify2.sql](Shopify2.sql) file.
 
 First I recreate the query from the first question to reference throughout
-```
+```SQL
 -- Create table from 1)
 CREATE TABLE product_orders AS
   SELECT product_variations.product,
@@ -62,7 +62,7 @@ CREATE TABLE product_orders AS
   ORDER BY product_variations.product, orders.placed_on;
 ```
 Then using the MIN() function I identify the first transaction of each year per product.
-```
+```SQL
 -- Find the first transaction (min) of each year
 CREATE TABLE first_dates AS
   SELECT product_orders.product as products,
@@ -88,7 +88,7 @@ The same is done to identify the date of the last transaction of each year using
 
 
 Next I joined the date of the first transaction of each year with its respective transaction
-```
+```SQL
 -- Join first transaction with its respective price
 CREATE TABLE first_prices AS
   SELECT DISTINCT first_dates.products,
@@ -124,7 +124,7 @@ You might wounder why there are multiple rows for one product (i.e product 3 abo
 I use the same query to join the last transaction of each year with its price
 
 Next, I calculate the price change for each year, per product. Note: the AVG() function is used as discussed above, to overcome the issue of when two transactions occur at the same time stamp. 
-```
+```SQL
 -- Average repeat sales with slightly different prices and calculate difference
 CREATE TABLE change_in_prices AS
   SELECT last_prices.products,
@@ -150,7 +150,7 @@ First 5 rows of result
 | 5        | 0.1700  | 0.2799 | 0.1700 | 0.0299 | 0.125  |
 
 Now that the price change difference for each product is calculated, simply using the AVG() function on each column will give us the average change each year.
-```
+```SQL
 -- calculate yearly average
 CREATE TABLE yearly_avg AS
   SELECT AVG(four) AS 'four_avg',
@@ -167,7 +167,7 @@ Result:
 | 0.7274   | 0.8588   | 0.6487   | 0.6337    | 0.5994    |
 
 Finally from this the average price increase for all years can be calculated by finding the average on each column
-```
+```SQL
 -- calculate final average price increase for all years
 SELECT (four_avg + five_avg + six_avg + seven_avg + eight_avg)/5
   AS average_annual_price_increase
